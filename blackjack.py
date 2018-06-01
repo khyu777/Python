@@ -78,50 +78,30 @@ def start():
     print('Hello ' + name)
 
 start()
-print('Drawing card...' + '\n'*2)
+dealer = Dealer()
+player = Player()
 
 while True:
-    print(pcard)
-    if dcount > 21: #dealer check 21
-        print(dcards)
-        print('Dealer went over 21 and you won!')
-    answer = input('What would you like to do? (Hit, Stand, or Split) ')
-    if pcount > 21: #player check 21
-        print(pcard)
-        print('You went over 21 and lost!')
-        restart()
-    if answer.lower() == 'hit': #player hit
-        pcard.append(drawcards())
-        pcount = pcount + pcard[-1][0]
-        if pcount > 21:
-            print(pcard)
-            print('You went over 21 and lost!')
-            restart()
-    elif answer.lower() == 'stand': #player stand
-        while dcount <= 13:
-            dcards.append(drawcards())
-            dcount = dcount + dcards[-1][0]
-            print(dcount)
-            if dcount > 21:
-                print('You won!')
-        print('\nDealer\'s hand: ' + str(dcards))
-        if pcount > dcount:
-            print('You won!')
-        elif pcount == dcount:
-            print('You tied!')
-        else:
-            print('You lost!')
-        restart()
-    elif answer.lower() == 'split': #player split
-        pcard1 = [pcard[0]]
-        pcard2 = [pcard[1]]
-        pcard1.append(drawcards())
-        pcard2.append(drawcards())
-        pcount1 = pcard1[0][0] + pcard1[1][0]
-        pcount2 = pcard2[0][0] + pcard2[1][0]
+    print('Drawing card...\n\n')
+    print(player.pcard)
+    dealer.check()
+    answer = input('What would you like to do? (Hit, Stand, or Split) ').lower()
+    if answer == 'hit':
+        player.hit()
+        print(player.pcard)
+        player.check()
+    elif answer == 'stand':
+        dealer.hit()
+        dealer.check()
+        print('Your hand: ', player.pcard)
+        print('Dealer\'s hand: ', dealer.dcards)
+        player.stand()
+    elif answer == 'split':
+        player.split()
         while True:
-            print('First: ', pcard1)
-            print('Second: ', pcard2)
+            print('First: ', player.pcard1)
+            print('Second: ', player.pcard2)
+#fix below
             if pcount1 > 21 or pcount2 > 21:
                 print('You lost!')
                 break
