@@ -3,11 +3,51 @@
 from random import randint
 import sys
 
+
 number = list(range(2,12))
 suit = ['spade', 'heart', 'diamond', 'clover']
 
+class Player:
+
+    pcard = [drawcards(), drawcards()]
+    pcount = pcard[0][0] + pcard[1][0]
+    pcard1 = []
+    pcard2 = []
+    
+    def __init__(self, name):
+        self.name = name
+
+    @classmethod
+    def hit(cls):
+        cls.pcard.append(drawcards())
+        cls.pcount += cls.pcard[-1][0]
+
+    @classmethod
+    def split(cls):
+        cls.pcard1 = [cls.pcard[0]]
+        cls.pcard2 = [cls.pcard[1]]
+        cls.pcard1.append(drawcards())
+        cls.pcard2.append(drawcards())
+        cls.pcount1 = cls.pcard1[0][0] + cls.pcard1[1][0]
+        cls.pcount2 = cls.pcard2[0][0] + cls.pcard2[1][0]
+
+class Dealer:
+
+    dcards = [drawcards(), drawcards()]
+    dcount = dcards[0][0] + dcards[1][0]
+
+    def stand(self):
+        while dcount <= 13:
+            dcards.append(drawcards())
+            dcount = dcount + dcards[-1][0]
+
 def drawcards():
-    return [number[randint(0,len(number)-1)],suit[randint(0,len(suit)-1)]]
+    return [number[randint(0,len(number)-1)],suit[randint(0,len(suit)-1)]]def start():
+
+def start():
+    print('Welcome to BlackJack')
+    name = input("What's your name? ")
+    print('Hello ' + name)
 
 def restart():
     global pcard, pcount, dcards, dcount
@@ -25,15 +65,9 @@ def restart():
             print('Please enter Y or N')
     print('')
 
-pcard = [drawcards(), drawcards()]
-pcount = pcard[0][0] + pcard[1][0]
-dcards = [drawcards(), drawcards()]
-dcount = dcards[0][0] + dcards[1][0]
 bid = 0
 
-print('Welcome to BlackJack')
-name = input("What's your name? ")
-print('Hello ' + name)
+start()
 print('Drawing card...' + '\n'*2)
 
 while True:
