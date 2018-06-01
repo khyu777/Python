@@ -3,69 +3,79 @@
 from random import randint
 import sys
 
-
 number = list(range(2,12))
 suit = ['spade', 'heart', 'diamond', 'clover']
 
-class Player:
+def drawcards():
+    return [number[randint(0,len(number)-1)],suit[randint(0,len(suit)-1)]]
 
-    pcard = [drawcards(), drawcards()]
-    pcount = pcard[0][0] + pcard[1][0]
-    pcard1 = []
-    pcard2 = []
-    
-    def __init__(self, name):
-        self.name = name
-
-    @classmethod
-    def hit(cls):
-        cls.pcard.append(drawcards())
-        cls.pcount += cls.pcard[-1][0]
-
-    @classmethod
-    def split(cls):
-        cls.pcard1 = [cls.pcard[0]]
-        cls.pcard2 = [cls.pcard[1]]
-        cls.pcard1.append(drawcards())
-        cls.pcard2.append(drawcards())
-        cls.pcount1 = cls.pcard1[0][0] + cls.pcard1[1][0]
-        cls.pcount2 = cls.pcard2[0][0] + cls.pcard2[1][0]
+def restart():
+    again = input('\nWould you like to play again? (Y/N) ')
+    if again.lower() == 'y':
+        player.pcard = [drawcards(), drawcards()]
+        player.pcount = player.pcard[0][0] + player.pcard[1][0]
+        dealer.dcards = [drawcards(), drawcards()]
+        dealer.dcount = dealer.dcards[0][0] + dealer.dcards[1][0]
+    elif again.lower() == 'n':
+        sys.exit()
+    else:
+        print('Please enter Y or N')
+    print('')
 
 class Dealer:
 
-    dcards = [drawcards(), drawcards()]
-    dcount = dcards[0][0] + dcards[1][0]
+    def __init__(self):
+        self.dcards = [drawcards(), drawcards()]
+        self.dcount = self.dcards[0][0] + self.dcards[1][0]
+
+    def hit(self):
+        while self.dcount <= 13:
+            self.dcards.append(drawcards())
+            self.dcount += self.dcards[-1][0]
+
+    def check(self):
+        if self.dcount > 21:
+            print('Dealer went over 21 and you won!')
+            restart()
+
+class Player():
+
+    def __init__(self):
+        self.pcard = [drawcards(), drawcards()]
+        self.pcount = self.pcard[0][0] + self.pcard[1][0]
+        self.pcard1 = []
+        self.pcard2 = []
+
+    def hit(self):
+        self.pcard.append(drawcards())
+        self.pcount += self.pcard[-1][0]
 
     def stand(self):
-        while dcount <= 13:
-            dcards.append(drawcards())
-            dcount = dcount + dcards[-1][0]
+        if self.pcount > dealer.dcount:
+            print('You won!')
+        elif self.pcount == dealer.dcount:
+            print('You tied!')
+        else:
+            print('You lost!')
+        restart()
+    
+    def split(self):
+        self.pcard1 = [self.pcard[0]]
+        self.pcard2 = [self.pcard[1]]
+        self.pcard1.append(drawcards())
+        self.pcard2.append(drawcards())
+        self.pcount1 = self.pcard1[0][0] + self.pcard1[1][0]
+        self.pcount2 = self.pcard2[0][0] + self.pcard2[1][0]
 
-def drawcards():
-    return [number[randint(0,len(number)-1)],suit[randint(0,len(suit)-1)]]def start():
+    def check(self):
+        if self.pcount > 21:
+            print('You went over 21 and lost!')
+            restart()
 
 def start():
     print('Welcome to BlackJack')
     name = input("What's your name? ")
     print('Hello ' + name)
-
-def restart():
-    global pcard, pcount, dcards, dcount
-    while True:
-        again = input('\nWould you like to play again? (Y/N) ')
-        if again.lower() == 'y':
-            pcard = [drawcards(), drawcards()]
-            pcount = pcard[0][0] + pcard[1][0]
-            dcards = [drawcards(), drawcards()]
-            dcount = dcards[0][0] + dcards[1][0]
-            break
-        elif again.lower() == 'n':
-            sys.exit()
-        else:
-            print('Please enter Y or N')
-    print('')
-
-bid = 0
 
 start()
 print('Drawing card...' + '\n'*2)
