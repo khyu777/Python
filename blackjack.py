@@ -6,18 +6,46 @@ import sys
 class GameManager:
 
     number = list(range(2,12))
+    letter = [['J',10], ['Q',10], ['K',10], ['A',11]]
     suit = ['spade', 'heart', 'diamond', 'clover']
 
     def __init__(self):
         self.dcards = [self.drawcards(), self.drawcards()]
-        self.dcount = self.dcards[0][0] + self.dcards[1][0]
         self.pcard = [self.drawcards(), self.drawcards()]
-        self.pcount = self.pcard[0][0] + self.pcard[1][0]
         self.pcard1 = []
         self.pcard2 = []
+        self.setdcount()
+        self.setpcount()
+
+    def setdcount(self):
+        if isinstance(self.dcards[0][0], list) == True and isinstance(self.dcards[1][0], list) == True:
+            self.dcount = self.dcards[0][0][1] + self.dcards[1][0][1]
+        elif isinstance(self.dcards[0][0], list) == True and isinstance(self.dcards[1][0], list) == False:
+            self.dcount = self.dcards[0][0][1] + self.dcards[1][0]
+        elif isinstance(self.dcards[0][0], list) == False and isinstance(self.dcards[1][0], list) == True:
+            self.dcount = self.dcards[0][0] + self.dcards[1][0][1]
+        else:
+            self.dcount = self.dcards[0][0] + self.dcards[1][0]
+
+    def setpcount(self):
+        if isinstance(self.pcard[0][0], list) == True and isinstance(self.pcard[1][0], list) == True:
+            self.pcount = self.pcard[0][0][1] + self.pcard[1][0][1]
+        elif isinstance(self.pcard[0][0], list) == True and isinstance(self.pcard[1][0], list) == False:
+            self.pcount = self.pcard[0][0][1] + self.pcard[1][0]
+        elif isinstance(self.pcard[0][0], list) == False and isinstance(self.pcard[1][0], list) == True:
+            self.pcount = self.pcard[0][0] + self.pcard[1][0][1]
+        else:
+            self.pcount = self.pcard[0][0] + self.pcard[1][0]
 
     def drawcards(self):
-        return [self.number[randint(0,len(self.number)-1)],self.suit[randint(0,len(self.suit)-1)]]
+        randnum = self.number[randint(0,len(self.number)-1)]
+        randsuit = self.suit[randint(0,len(self.suit)-1)]
+        if randnum == 10:
+            return [self.letter[randint(0,2)],randsuit]
+        elif randnum == 11:
+            return [self.letter[3], randsuit]
+        else:
+            return [randnum, randsuit]
 
     def start(self):
         print('Welcome to BlackJack')
@@ -26,17 +54,19 @@ class GameManager:
         print('Drawing card...\n')
 
     def restart(self):
-        again = input('\nWould you like to play again? (Y/N) ')
-        if again.lower() == 'y':
-            self.pcard = [self.drawcards(), self.drawcards()]
-            self.pcount = self.pcard[0][0] + self.pcard[1][0]
-            self.dcards = [self.drawcards(), self.drawcards()]
-            self.dcount = self.dcards[0][0] + self.dcards[1][0]
-        elif again.lower() == 'n':
-            sys.exit()
-        else:
-            print('Please enter Y or N')
-        print('')
+        while True:
+            again = input('\nWould you like to play again? (Y/N) ')
+            if again.lower() == 'y':
+                self.pcard = [self.drawcards(), self.drawcards()]
+                self.pcount = self.pcard[0][0] + self.pcard[1][0]
+                self.dcards = [self.drawcards(), self.drawcards()]
+                self.dcount = self.dcards[0][0] + self.dcards[1][0]
+                return False
+            elif again.lower() == 'n':
+                sys.exit()
+            else:
+                print('Please enter Y or N')
+            print('')
 
     def dhit(self):
         while self.dcount <= 13:
@@ -82,7 +112,7 @@ while True:
     print(game.pcard)
     game.pcheck()
     game.dcheck()
-    answer = input('What would you like to do? (Hit, Stand, or Split) ').lower()
+    answer = input('\nWhat would you like to do? (Hit, Stand, or Split) ').lower()
     if answer == 'hit':
         game.phit()
         game.pcheck()
