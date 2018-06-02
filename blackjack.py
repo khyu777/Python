@@ -10,74 +10,98 @@ def drawcards():
     return [number[randint(0,len(number)-1)],suit[randint(0,len(suit)-1)]]
 
 def restart():
-    global pcard, pcount, dcards, dcount
-    while True:
-        again = input('\nWould you like to play again? (Y/N) ')
-        if again.lower() == 'y':
-            pcard = [drawcards(), drawcards()]
-            pcount = pcard[0][0] + pcard[1][0]
-            dcards = [drawcards(), drawcards()]
-            dcount = dcards[0][0] + dcards[1][0]
-            break
-        elif again.lower() == 'n':
-            sys.exit()
-        else:
-            print('Please enter Y or N')
+    again = input('\nWould you like to play again? (Y/N) ')
+    if again.lower() == 'y':
+        player.pcard = [drawcards(), drawcards()]
+        player.pcount = player.pcard[0][0] + player.pcard[1][0]
+        dealer.dcards = [drawcards(), drawcards()]
+        dealer.dcount = dealer.dcards[0][0] + dealer.dcards[1][0]
+    elif again.lower() == 'n':
+        sys.exit()
+    else:
+        print('Please enter Y or N')
     print('')
 
-pcard = [drawcards(), drawcards()]
-pcount = pcard[0][0] + pcard[1][0]
-dcards = [drawcards(), drawcards()]
-dcount = dcards[0][0] + dcards[1][0]
-bid = 0
+class Dealer:
 
-print('Welcome to BlackJack')
-name = input("What's your name? ")
-print('Hello ' + name)
-print('Drawing card...' + '\n'*2)
+    def __init__(self):
+        self.dcards = [drawcards(), drawcards()]
+        self.dcount = self.dcards[0][0] + self.dcards[1][0]
 
-while True:
-    print(pcard)
-    if dcount > 21: #dealer check 21
-        print(dcards)
-        print('Dealer went over 21 and you won!')
-    answer = input('What would you like to do? (Hit, Stand, or Split) ')
-    if pcount > 21: #player check 21
-        print(pcard)
-        print('You went over 21 and lost!')
-        restart()
-    if answer.lower() == 'hit': #player hit
-        pcard.append(drawcards())
-        pcount = pcount + pcard[-1][0]
-        if pcount > 21:
-            print(pcard)
-            print('You went over 21 and lost!')
+    def hit(self):
+        while self.dcount <= 13:
+            self.dcards.append(drawcards())
+            self.dcount += self.dcards[-1][0]
+
+    def check(self):
+        if self.dcount > 21:
+            print('Dealer went over 21 and you won!')
             restart()
-    elif answer.lower() == 'stand': #player stand
-        while dcount <= 13:
-            dcards.append(drawcards())
-            dcount = dcount + dcards[-1][0]
-            print(dcount)
-            if dcount > 21:
-                print('You won!')
-        print('\nDealer\'s hand: ' + str(dcards))
-        if pcount > dcount:
+
+class Player():
+
+    def __init__(self):
+        self.pcard = [drawcards(), drawcards()]
+        self.pcount = self.pcard[0][0] + self.pcard[1][0]
+        self.pcard1 = []
+        self.pcard2 = []
+
+    def hit(self):
+        self.pcard.append(drawcards())
+        self.pcount += self.pcard[-1][0]
+
+    def stand(self):
+        if self.pcount > dealer.dcount:
             print('You won!')
-        elif pcount == dcount:
+        elif self.pcount == dealer.dcount:
             print('You tied!')
         else:
             print('You lost!')
         restart()
-    elif answer.lower() == 'split': #player split
-        pcard1 = [pcard[0]]
-        pcard2 = [pcard[1]]
-        pcard1.append(drawcards())
-        pcard2.append(drawcards())
-        pcount1 = pcard1[0][0] + pcard1[1][0]
-        pcount2 = pcard2[0][0] + pcard2[1][0]
+    
+    def split(self):
+        self.pcard1 = [self.pcard[0]]
+        self.pcard2 = [self.pcard[1]]
+        self.pcard1.append(drawcards())
+        self.pcard2.append(drawcards())
+        self.pcount1 = self.pcard1[0][0] + self.pcard1[1][0]
+        self.pcount2 = self.pcard2[0][0] + self.pcard2[1][0]
+
+    def check(self):
+        if self.pcount > 21:
+            print('You went over 21 and lost!')
+            restart()
+
+def start():
+    print('Welcome to BlackJack')
+    name = input("What's your name? ")
+    print('Hello ' + name)
+
+start()
+dealer = Dealer()
+player = Player()
+
+while True:
+    print('Drawing card...\n\n')
+    print(player.pcard)
+    dealer.check()
+    answer = input('What would you like to do? (Hit, Stand, or Split) ').lower()
+    if answer == 'hit':
+        player.hit()
+        print(player.pcard)
+        player.check()
+    elif answer == 'stand':
+        dealer.hit()
+        dealer.check()
+        print('Your hand: ', player.pcard)
+        print('Dealer\'s hand: ', dealer.dcards)
+        player.stand()
+    elif answer == 'split':
+        player.split()
         while True:
-            print('First: ', pcard1)
-            print('Second: ', pcard2)
+            print('First: ', player.pcard1)
+            print('Second: ', player.pcard2)
+#fix below
             if pcount1 > 21 or pcount2 > 21:
                 print('You lost!')
                 break
