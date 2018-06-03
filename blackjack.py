@@ -16,26 +16,7 @@ class GameManager:
         self.pcard2 = []
         self.setdcount()
         self.setpcount()
-
-    def setdcount(self):
-        if isinstance(self.dcards[0][0], list) == True and isinstance(self.dcards[1][0], list) == True:
-            self.dcount = self.dcards[0][0][1] + self.dcards[1][0][1]
-        elif isinstance(self.dcards[0][0], list) == True and isinstance(self.dcards[1][0], list) == False:
-            self.dcount = self.dcards[0][0][1] + self.dcards[1][0]
-        elif isinstance(self.dcards[0][0], list) == False and isinstance(self.dcards[1][0], list) == True:
-            self.dcount = self.dcards[0][0] + self.dcards[1][0][1]
-        else:
-            self.dcount = self.dcards[0][0] + self.dcards[1][0]
-
-    def setpcount(self):
-        if isinstance(self.pcard[0][0], list) == True and isinstance(self.pcard[1][0], list) == True:
-            self.pcount = self.pcard[0][0][1] + self.pcard[1][0][1]
-        elif isinstance(self.pcard[0][0], list) == True and isinstance(self.pcard[1][0], list) == False:
-            self.pcount = self.pcard[0][0][1] + self.pcard[1][0]
-        elif isinstance(self.pcard[0][0], list) == False and isinstance(self.pcard[1][0], list) == True:
-            self.pcount = self.pcard[0][0] + self.pcard[1][0][1]
-        else:
-            self.pcount = self.pcard[0][0] + self.pcard[1][0]
+        self.bank = 1000
 
     def drawcards(self):
         randnum = self.number[randint(0,len(self.number)-1)]
@@ -61,13 +42,23 @@ class GameManager:
                 self.setpcount()
                 self.dcards = [self.drawcards(), self.drawcards()]
                 self.setdcount()
-                return False
+                break
             elif again.lower() == 'n':
                 sys.exit()
             else:
                 print('Please enter Y or N')
             print('')
+        self.pbet()
 
+    #Dealer
+
+    def dcheck(self):
+        if self.dcount > 21:
+            print('\nDealer\'s hand: ', self.dcards)
+            print('Dealer went over 21 and you won!')
+            self.bank += self.bet
+            self.restar()
+            
     def dhit(self):
         while self.dcount <= 13:
             self.dcards.append(self.drawcards())
@@ -76,12 +67,41 @@ class GameManager:
             else:
                 self.dcount += self.dcards[-1][0]
 
-    def dcheck(self):
-        if self.dcount > 21:
-            print('\nDealer\'s hand: ', self.dcards)
-            print('Dealer went over 21 and you won!')
-            self.restart()
+    def setdcount(self):
+        if isinstance(self.dcards[0][0], list) == True and isinstance(self.dcards[1][0], list) == True:
+            self.dcount = self.dcards[0][0][1] + self.dcards[1][0][1]
+        elif isinstance(self.dcards[0][0], list) == True and isinstance(self.dcards[1][0], list) == False:
+            self.dcount = self.dcards[0][0][1] + self.dcards[1][0]
+        elif isinstance(self.dcards[0][0], list) == False and isinstance(self.dcards[1][0], list) == True:
+            self.dcount = self.dcards[0][0] + self.dcards[1][0][1]
+        else:
+            self.dcount = self.dcards[0][0] + self.dcards[1][0]
 
+    #Player
+     
+    def pcheck(self):
+        if self.pcount > 21:
+            print('\nYour hand: ', self.pcard)
+            print('You went over 21 and lost!')
+            self.bank -= self.bet
+            self.bankrupt()
+            self.restart()
+       
+    def pbet(self):
+        print('You currently have', '$' + str(self.bank), 'in your bank.')
+        while True:
+            self.bet = input('\nHow much would you like to bet?: ')
+            if self.bet.isdigit() == True:
+                self.bet = int(self.bet)
+                if self.bet == 0:
+                    print('You can\'t bet nothing')
+                elif self.bet > self.bank:
+                    print('Insufficient fund in bank')
+                elif self.bet <= self.bank:
+                    break
+            else:
+                print('Please enter a valid number')
+                
     def phit(self):
         self.pcard.append(self.drawcards())
         if isinstance(self.pcard[-1][0], list) == True:
@@ -92,10 +112,13 @@ class GameManager:
     def stand(self):
         if self.pcount > self.dcount:
             print('You won!')
+            self.bank += self.bet
         elif self.pcount == self.dcount:
             print('You tied!')
         else:
             print('You lost!')
+            self.bank -= self.bet
+            self.bankrupt()
     
     def split(self):
         self.pcard1 = [self.pcard[0]]
@@ -105,30 +128,43 @@ class GameManager:
         self.pcount1 = self.pcard1[0][0] + self.pcard1[1][0]
         self.pcount2 = self.pcard2[0][0] + self.pcard2[1][0]
 
-    def pcheck(self):
-        if self.pcount > 21:
-            print('\nYour hand: ', self.pcard)
-            print('You went over 21 and lost!')
-            self.restart()
+    def setpcount(self):
+        if isinstance(self.pcard[0][0], list) == True and isinstance(self.pcard[1][0], list) == True:
+            self.pcount = self.pcard[0][0][1] + self.pcard[1][0][1]
+        elif isinstance(self.pcard[0][0], list) == True and isinstance(self.pcard[1][0], list) == False:
+            self.pcount = self.pcard[0][0][1] + self.pcard[1][0]
+        elif isinstance(self.pcard[0][0], list) == False and isinstance(self.pcard[1][0], list) == True:
+            self.pcount = self.pcard[0][0] + self.pcard[1][0][1]
+        else:
+            self.pcount = self.pcard[0][0] + self.pcard[1][0]
             
     def checkA(self):
         for i in range(2):
             if isinstance(self.pcard[i][0], list) == True:
-                if self.pcard[i][0][0] == 'A':
-                    ainput = int(input('1 or 11? '))
-                    if ainput == 1:
-                        self.pcard[i][0][1] = 1
-                        print('\n')
-                        print(self.pcard)
-                    elif ainput == 11:
-                        self.pcard[i][0][1] = 11
-                        print('\n')
-                        print(self.pcard)
-                    else:
-                        print('Please enter 1 or 11')
+                while True:
+                    if self.pcard[i][0][0] == 'A':
+                        ainput = input('1 or 11? ')
+                        if ainput == '1':
+                            self.pcard[i][0][1] = 1
+                            print('\n')
+                            print(self.pcard)
+                            break
+                        elif ainput == '11':
+                            self.pcard[i][0][1] = 11
+                            print('\n')
+                            print(self.pcard)
+                            break
+                        else:
+                            print('Please enter 1 or 11')
+
+    def bankrupt(self):
+        if self.bank == 0:
+            print('You went bankrupt!')
+            self.bank = 1000
                 
 game = GameManager()
 game.start()
+game.pbet()
 count = 0
 
 while True:
@@ -149,7 +185,6 @@ while True:
         game.dcheck()
         print('\nYour hand: ', game.pcard)
         print('Dealer\'s hand: ', game.dcards)
-        print(game.pcount, game.dcount)
         game.stand()
         game.restart()
         count = 0
