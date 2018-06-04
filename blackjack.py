@@ -17,6 +17,7 @@ class GameManager:
         self.setdcount()
         self.setpcount()
         self.bank = 1000
+        self.counter = 0
 
     def drawcards(self):
         randnum = self.number[randint(0,len(self.number)-1)]
@@ -49,6 +50,7 @@ class GameManager:
                 print('Please enter Y or N')
             print('')
         self.pbet()
+        self.counter = 0
 
     #Dealer
 
@@ -57,7 +59,7 @@ class GameManager:
             print('\nDealer\'s hand: ', self.dcards)
             print('Dealer went over 21 and you won!')
             self.bank += self.bet
-            self.restar()
+            self.restart()
             
     def dhit(self):
         while self.dcount <= 13:
@@ -110,6 +112,8 @@ class GameManager:
             self.pcount += self.pcard[-1][0]
 
     def stand(self):
+        self.dhit()
+        self.dcheck()
         if self.pcount > self.dcount:
             print('You won!')
             self.bank += self.bet
@@ -119,7 +123,7 @@ class GameManager:
             print('You lost!')
             self.bank -= self.bet
             self.bankrupt()
-    
+        self.restart()
     def split(self):
         self.pcard1 = [self.pcard[0]]
         self.pcard2 = [self.pcard[1]]
@@ -148,14 +152,18 @@ class GameManager:
                             self.pcard[i][0][1] = 1
                             print('\n')
                             print(self.pcard)
+                            self.counter += 1
                             break
                         elif ainput == '11':
                             self.pcard[i][0][1] = 11
                             print('\n')
                             print(self.pcard)
+                            self.counter += 1
                             break
                         else:
                             print('Please enter 1 or 11')
+                    else:
+                        break
 
     def bankrupt(self):
         if self.bank == 0:
@@ -168,26 +176,28 @@ game.pbet()
 count = 0
 
 while True:
-    print(game.pcard)
-    if count == 0:
+    print('start', game.pcard)
+    print(game.counter)
+    if game.counter == 0:
         game.checkA()
         game.setdcount()
         game.setpcount()
-        count += 1
+        game.counter += 1
     game.pcheck()
     game.dcheck()
     answer = input('\nWhat would you like to do? (Hit, Stand, or Split) ').lower()
     if answer == 'hit':
+        print('hit')
         game.phit()
         game.pcheck()
+        print('hit end')
     elif answer == 'stand':
-        game.dhit()
-        game.dcheck()
+        print('stand')
         print('\nYour hand: ', game.pcard)
         print('Dealer\'s hand: ', game.dcards)
         game.stand()
-        game.restart()
         count = 0
+        print('stand end')
     elif answer == 'split':
         game.split()
         while True:
